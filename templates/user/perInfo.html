@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    个人中心
+{% endblock %}
+{% block myCss %}
+    <link rel="stylesheet" href="{% static "css/about.css" %}">
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .img-circle {
+            max-width: 100px;
+            max-height: 100px;
+        }
+    </style>
+{% endblock %}
+{% block container %}
+    <article>
+        <div class="photowall">
+            <ul class="wall_a">
+                <li><a href="/"><img src="{% static "images/1.jpg" %}">
+                    <figcaption>
+                        <h2>不再因为别人过得好而焦虑，在没有人看得到你的时候依旧能保持节奏 </h2>
+                    </figcaption>
+                </a></li>
+                <li>
+                    <p class="text_b"><a href="/">逃避自己的人，最终只能导致自己世界的崩塌，而变得越来越没有安全感。</a></p>
+                </li>
+                <li><a href="/"><img src="{% static "images/3.jpg" %}">
+                    <figcaption>
+                        <h2>不再因为别人过得好而焦虑，在没有人看得到你的时候依旧能保持节奏 </h2>
+                    </figcaption>
+                </a></li>
+                <li>
+                    <p class="text_b"><a href="/">逃避自己的人，最终只能导致自己世界的崩塌，而变得越来越没有安全感。</a></p>
+                </li>
+                <li>
+                    <p class="text_b"><a href="/">逃避自己的人，最终只能导致自己世界的崩塌，而变得越来越没有安全感。</a></p>
+                </li>
+                <li><a href="/"><img src="{% static "images/5.jpg" %}">
+                    <figcaption>
+                        <h2>不再因为别人过得好而焦虑，在没有人看得到你的时候依旧能保持节奏 </h2>
+                    </figcaption>
+                </a></li>
+                <li>
+                    <p class="text_b"><a href="/">逃避自己的人，最终只能导致自己世界的崩塌，而变得越来越没有安全感。</a></p>
+                </li>
+                <li><a href="/"><img src="{% static "images/6.jpg" %}">
+                    <figcaption>
+                        <h2>不再因为别人过得好而焦虑，在没有人看得到你的时候依旧能保持节奏 </h2>
+                    </figcaption>
+                </a></li>
+            </ul>
+        </div>
+        <div class="abox">
+            <form action="{% url 'user:perInfo' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h3>个人信息</h3>
+                <div class="form-group">
+                    <label for="username">Name</label>
+                    <input type="text" class="form-control" id="username" placeholder="{{ userInfo.username }}" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" class="form-control" id="email" placeholder="{{ userInfo.email }}">
+                </div>
+                <div class="form-group">
+                    <img src="{{ userInfo.yunIcon }}" alt="头像" class="img-circle" style="display: inline-block">
+                    <input type="file" style="display: inline-block" name="icon">
+                </div>
+                <button type="submit" class="btn btn-primary">提交</button>
+            </form>
+        </div>
+    </article>
+{% endblock %}
+{% block myJs %}
+    <script src="{% static "js/ab.js" %}"></script>
+{% endblock %}

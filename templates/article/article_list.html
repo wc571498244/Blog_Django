@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    文章列表
+{% endblock %}
+{% block myCss %}
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% endblock %}
+{% block container %}
+    <article>
+        <main>
+            <div class="place" id="pageContents">
+                {#                <a href="#" id="pagecurrent">#}
+                {#                    {% if tag_id %}#}
+                {#                        {{ tag.name }}#}
+                {#                    {% else %}#}
+                {#                        全部文章#}
+                {#                    {% endif %}#}
+                {#                </a>#}
+                <div class="place" id="pageContents">
+                    {% if tag not in  tags %}
+                        <a href="{% url 'article:article_list' %}" id="pagecurrent">全部文章</a>
+                    {% else %}
+                        <a href="{% url 'article:article_list' %}">全部文章</a>
+                    {% endif %}
+                    {% for tag1 in tags %}
+                        {% if tag1.id == tag_id %}
+                            <a href="{% url 'article:article_list' %}?tag_id={{ tag1.id }}" id="pagecurrent">{{ tag1 }}</a>
+                        {% else %}
+                            <a href="{% url 'article:article_list' %}?tag_id={{ tag1.id }}">{{ tag1 }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+            </div>
+            {% for article in current_articles %}
+                <div class="blogs" data-scroll-reveal="enter bottom over 1s">
+                    <h3 class="blogtitle"><a href="{% url 'article:details' %}?article_id={{ article.id }}"
+                                             target="_blank">{{ article.title }}</a></h3>
+                    <span class="blogpic"><a href="{{ MEDIA_URL }}{{ article.img }}" title=""><img
+                            src="{{ MEDIA_URL }}{{ article.img }}" alt=""></a></span>
+                    <p class="blogtext">{{ article.desc }}</p>
+                    <div class="bloginfo">
+                        <ul>
+                            <li class="author"><a href="/">{{ article.user.username }}</a></li>
+                            <li class="lmname"><a
+                                    href="{% url 'article:article_list' %}?tag_id={{ article.tags.all.0.id }}">{{ article.tags.all.0 }}</a>
+                            </li>
+                            <li class="timer">{{ article.date | date:"Y-m-d" }}</li>
+                            <li class="view"><span>{{ article.click_num }}</span>已阅读</li>
+                            <li class="like">{{ article.love_num }}</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="pagelist">
+                <a href="{% url 'article:article_list' %}?page={{ current_articles.paginator.page_range.0 }}&tag_id={{ tag_id }}">首页</a>
+                {% if current_articles.has_previous %}
+                    <a href="{% url 'article:article_list' %}?page={{ current_articles.previous_page_number }}&tag_id={{ tag_id }}">上一页</a>
+                {% else %}
+                    <span>上一页</span>
+                {% endif %}
+
+                {% for page in page_range %}
+                    {% if current_page == page %}
+                        <b>{{ page }}</b>
+                    {% else %}
+                        <a href="{% url 'article:article_list' %}?page={{ page }}&tag_id={{ tag_id }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if current_articles.has_next %}
+                    <a href="{% url 'article:article_list' %}?page={{ current_articles.next_page_number }}&tag_id={{ tag_id }}">下一页</a>
+                {% else %}
+                    <span>下一页</span>
+                {% endif %}
+                <a href="{% url 'article:article_list' %}?page={{ current_articles.paginator.page_range.stop | add:"-1" }}&tag_id={{ tag_id }}">尾页</a>
+            </div>
+        </main>
+        <aside class="r_box">
+            {#            <div class="wdxc">#}
+            {#                <h2>图文精选</h2>#}
+            {#                <ul>#}
+            {#                    <li><a href="/"><img src="images/7.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/8.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/9.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/10.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/11.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/12.jpg"></a></li>#}
+            {#                </ul>#}
+            {#            </div>#}
+            <div class="cloud">
+                <h2>标签云</h2>
+                <ul>
+                    {% for tag in tags_cloud %}
+                        <a href="{% url 'article:article_list' %}?tag_id={{ tag.id }}">{{ tag.name }}</a>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tuijian">
+                <h2 id="tab"><a href="#" class="current">点击排行</a><a href="#">收藏排行</a></h2>
+
+                <div id="content">
+                    <ul style="display:block;">
+                        {% for click in click_rank %}
+                            <li><a href="{% url "article:details" %}?article_id={{ click.id }}">{{ click.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul>
+                        {% for love in love_rank %}
+                            <li><a href="{% url "article:details" %}?article_id={{ love.id }}">{{ love.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="guanzhu">
+                <h2>关注我</h2>
+                <ul>
+                    <img src="{% static 'images/WCWX.jpg' %}">
+                </ul>
+            </div>
+
+        </aside>
+    </article>
+{% endblock %}

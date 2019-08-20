@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    文章详情 | {{ article_info.title }}
+{% endblock %}
+{% block myCss %}
+    <link href="{% static 'css/info.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap3.3.7.css' %}">
+{% endblock %}
+{% block markdownCss %}
+    <link rel="stylesheet" href="{% static 'css/markdownCss/editormd.preview.css' %}">
+
+    <style>
+        .editormd-html-preview code {
+            color: #c7254e;
+        }
+
+        li {
+            list-style: disc;
+        }
+
+        img {
+            padding: 10px;
+        }
+
+        .editormd-html-preview pre.prettyprint {
+            margin-top: 10px;
+        }
+
+        .bloginfo li {
+            list-style: none;
+        }
+
+        .gbko ul {
+            margin: 10px 10px;
+            padding: 10px 10px 10px 0px;
+            border-bottom: #ececec 1px solid;
+        }
+
+        .fbtime span {
+            float: right;
+            color: #999;
+            font-size: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .fbtime {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        h2 a {
+            color: #5bc0de;
+        }
+
+        .captcha {
+            max-width: 100px !important;
+            display: inline-block;
+        }
+
+        label {
+            font-size: 18px;
+        }
+
+        .form-control {
+            margin-bottom: 10px;
+        }
+
+        form {
+            padding: 10px;
+        }
+
+        .news_pl h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        #captcha_status_S {
+            color: #0da919;
+        }
+
+        #captcha_status_E {
+            color: red;
+        }
+
+        h1, .h1, h2, .h2, h3, .h3 {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .cloud ul a {
+            height: 32px;
+        }
+    </style>
+{% endblock %}
+{% block container %}
+    <article>
+        <main>
+            <div class="infosbox">
+                <div class="newsview">
+                    <h3 class="news_title">{{ article_info.title }}</h3>
+                    <div class="bloginfo">
+                        <ul>
+                            <li class="author"><i class="fa fa-user" aria-hidden="true"></i> <a
+                                    href="/">{{ article_info.user.username }}</a></li>
+                            <li class="lmname"><i class="fa fa-tags" aria-hidden="true"></i>
+                                {% for tag in article_info.tags.all %}
+                                    <a href="{% url 'article:article_list' %}?tag_id={{ tag.id }}">{{ tag.name }}</a>
+                                {% endfor %}
+                            </li>
+                            <li class="timer"><i class="fa fa-clock-o"
+                                                 aria-hidden="true"></i> {{ article_info.date | date:"Y-m-d G:i" }}</li>
+                            <li class="view"><i class="fa fa-eye" aria-hidden="true"></i> {{ article_info.click_num }}人已阅读
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tags">
+                        {% for tag in article_info.tags.all %}
+                            <a href="{% url 'article:article_list' %}?tag_id={{ tag.id }}"
+                               target="_blank">{{ tag.name }}</a> &nbsp;
+                        {% endfor %}
+                    </div>
+                    <div class="news_about">
+                        <strong>简介</strong>
+                        {{ article_info.desc }}
+                    </div>
+                    <div class="news_con" id="article_content"
+                         style="-webkit-box-sizing: border-box;-moz-box-sizing: border-box;">
+                        <textarea style="display: none">{{ article_info.content | safe }}</textarea>
+                    </div>
+                </div>
+                <div class="share">
+                    <p class="diggit">
+                        <a href="">很赞哦！ </a>(<b id="diggnum">13</b>)
+                    </p>
+                </div>
+                <div class="nextinfo">
+                    <p>上一篇：
+                        {% if front_article %}
+                            <a href="{% url 'article:details' %}?article_id={{ front_article.id }}">{{ front_article.title }}</a>
+                        {% else %}
+                            <span>--没有了--</span>
+                        {% endif %}
+                    </p>
+                    <p>下一篇：
+                        {% if next_article %}
+                            <a href="{% url 'article:details' %}?article_id={{ next_article.id }}">{{ next_article.title }}</a>
+                        {% else %}
+                            <span>--没有了--</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="news_pl">
+                    <h2><i class="fa fa-comments-o" aria-hidden="true"></i>评论列表</h2>
+                    {% for comment in comments %}
+                        <div class="gbko">
+                            <div class="fb">
+                                <ul>
+                                    <p class="fbtime"><span>{{ comment.date }}</span>{{ comment.user.username }}</p>
+                                    <p class="fbinfo">{{ comment.content }}</p>
+                                </ul>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>--暂无评论--</p>
+                    {% endfor %}
+                </div>
+                <div class="news_pl">
+                    <h2>
+                        {% if not request.user.id %}
+                            <span><i class="fa fa-commenting-o" aria-hidden="true"></i>若想评论,请先 <a
+                                    href="{% url 'user:user_login' %}">登录</a>！</span>
+                        {% else %}
+                            <span><i class="fa fa-commenting-o" aria-hidden="true"></i>发表评论</span>
+                        {% endif %}
+                    </h2>
+                    <form action="{% url 'article:send_comments' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="userId" value="{{ request.user.id }}">
+                        <input type="hidden" name="articleId" value="{{ article_info.id }}">
+                        {{ cform.content.label_tag }}
+                        {{ cform.content }}
+                        <label>验证码：</label>{{ cform.captcha }}
+                        <botton type="submit" class="btn btn-primary" id="submit">提交评论</botton>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <aside class="r_box">
+            {#            <div class="wdxc">#}
+            {#                <h2>图文精选</h2>#}
+            {#                <ul>#}
+            {#                    <li><a href="/"><img src="images/7.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/8.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/9.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/10.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/11.jpg"></a></li>#}
+            {#                    <li><a href="/"><img src="images/12.jpg"></a></li>#}
+            {#                </ul>#}
+            {#            </div>#}
+            <div class="fenlei">
+                <h2>文章分类</h2>
+                <ul>
+                    {% for tag in tags %}
+                        <li>
+                            <a href="{% url 'article:article_list' %}?tag_id={{ tag.id }}">{{ tag.name }}（{{ tag.article_set.count }}）</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="cloud">
+                <h2>标签云</h2>
+                <ul>
+                    {% for t_cloud in tags_cloud %}
+                        <a href="{% url 'article:article_list' %}?tag_id={{ t_cloud.id }}">{{ t_cloud.name }}</a>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tuijian">
+                <h2 id="tab">
+                    <a href="#" class="current">点击排行</a>
+                    <a href="#">收藏排行</a>
+                </h2>
+                <div id="content">
+                    <ul style="display:block;">
+                        {% for click in click_rank %}
+                            <li><a href="{% url 'article:details' %}?article_id={{ click.id }}">{{ click.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul>
+                        {% for love in love_rank %}
+                            <li><a href="{% url 'article:details' %}?article_id={{ love.id }}">{{ love.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="guanzhu">
+                <h2>关注我</h2>
+                <ul>
+                    <img src="{% static 'images/WCWX.jpg' %}">
+                </ul>
+            </div>
+
+        </aside>
+    </article>
+{% endblock %}
+
+{% block myJs %}
+    <script src="{% static 'js/markdownJs/prettify.min.js' %}"></script>
+    <script src="{% static 'js/markdownJs/marked.min.js' %}"></script>
+    <script src="{% static 'js/markdownJs/editormd.js' %}"></script>
+    <script>
+
+        editormd.markdownToHTML("article_content", {    //article_content是html文档的id
+            emoji: true,
+            taskList: true,
+        });
+        $("#id_captcha_1").addClass("form-control").attr({"placeholder": "请输入验证码"});
+
+        // 设置图片的指针属性
+        $('.captcha').css({
+            'cursor': 'pointer'
+        });
+        // ajax刷新
+        $('.captcha').click(function () {
+            $.getJSON("/captcha/refresh/", function (result) {
+                $('.captcha').attr('src', result['image_url']);
+                $('#id_captcha_0').val(result['key'])
+            })
+        });
+        // ajax验证
+        $("#id_captcha_1").blur(function () {
+            // 清除ajax验证消息
+            $("#captcha_status_E").remove();
+            $("#captcha_status_S").remove();
+            json_data = {
+                'response': $('#id_captcha_1').val(), // 获取输入框和隐藏字段id_captcha_0的数值
+                'hashkey': $('#id_captcha_0').val()
+            };
+            $.getJSON("/user/ajax_val", json_data, function (data) {
+                //ajax发送
+                $('#captcha_status').remove();
+                if (data['status']) { //status返回1为验证码正确， status返回0为验证码错误， 在输入框的后面写入提示信息
+                    $('#id_captcha_1').after('<div id="captcha_status_S" >*验证码正确</div>')
+                } else {
+                    $('#id_captcha_1').after('<div id="captcha_status_E" >*验证码错误</div>')
+                }
+            });
+        });
+        // ajax提交评论
+        $("#submit").click(function () {
+            var flag = true;
+            json_data = {
+                'response': $('#id_captcha_1').val(), // 获取输入框和隐藏字段id_captcha_0的数值
+                'hashkey': $('#id_captcha_0').val()
+            };
+            $.getJSON("/user/ajax_val", json_data, function (data) {
+                //ajax发送
+                $('#captcha_status').remove();
+                if (data['status']) { //status返回1为验证码正确， status返回0为验证码错误， 在输入框的后面写入提示信息
+                    data = {
+                        'content': $("textarea[name=content]").val(),
+                        'userId': $("input[name=userId]").val(),
+                        'articleId': $("input[name=articleId]").val(),
+                    };
+                    $.getJSON("{% url 'article:send_comments' %}", data, function (data) {
+                        if (data['status']) {
+                            alert("恭喜你评论成功！");
+                            window.location.reload();
+                        } else {
+                            alert("对不起评论失败，出现bug！请重新填写。");
+                        }
+                    });
+                } else {
+                    flag = false;
+                    return false;
+                }
+            });
+            if (flag == false) {
+                alert("验证错误，请重新输入验证码！");
+                return false;
+            }
+        });
+    </script>
+{% endblock %}

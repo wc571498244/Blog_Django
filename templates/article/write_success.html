@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}
+    写博客
+{% endblock %}
+{% block myCss %}
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+{% endblock %}
+{% block markdownCss %}
+
+    <style>
+        .container {
+            max-width: 60%;
+            margin-top: 10%;
+        }
+
+        .panel-title a {
+            color: #5bc0de;
+        }
+
+        .panel-title a:hover {
+            color: #5aaae2;
+        }
+
+        .panel-body {
+            text-align: center;
+        }
+
+        .big-info {
+            color: #0da919;
+            font-size: 50px;
+        }
+
+        .big-info span {
+            font-size: 28px;
+        }
+
+        .em-right {
+            float: right;
+        }
+
+        .em-right a {
+            color: #f0ad4e;
+        }
+    </style>
+{% endblock %}
+{% block container %}
+    <article>
+        <div class="container">
+            <div class="panel ">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a href="{% url 'article:article_list' %}">
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>查看文章列表</a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="big-info"><i class="fa fa-check-circle" aria-hidden="true"></i><span>发表成功</span></div>
+                    <em class="em-right"><a href="{% url 'article:details' %}?article_id={{ article_id }}">查看文章&nbsp;&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i></a></em>
+                </div>
+            </div>
+        </div>
+
+    </article>
+{% endblock %}

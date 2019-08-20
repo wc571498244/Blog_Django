@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    写博客
+{% endblock %}
+{% block myCss %}
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+{% endblock %}
+{% block markdownCss %}
+    <style>
+        .form-horizontal {
+            background-color: #ffffff;
+            padding: 10px;
+        }
+
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /*
+                .col-sm-11 {
+                    width: 87.666667%;
+                }
+
+                .col-sm-1 {
+                    width: 12.333333%;
+                }
+        */
+        .show-half {
+            max-width: 50%;
+        }
+    </style>
+{% endblock %}
+{% block write_article %}
+    id="selected"
+{% endblock %}
+{% block container %}
+    <article>
+        <form class="form-horizontal" action="{% url 'article:write_article' %}" method="post"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="userId" value="{{ request.user.id }}">
+            <h3 class="form-title">写博客</h3>
+            <div class="form-group">
+                <label for="title" class="col-sm-2 col-xs-2 control-label">文章标题</label>
+                <div class="col-sm-10 col-xs-10">
+                    <input type="text" name="title" class="form-control show-half" id="title" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="desc" class="col-sm-2 control-label col-xs-2">简介</label>
+                <div class="col-sm-10 col-xs-10">
+                    <input type="text" name="desc" class="form-control show-half" id="desc" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="content" class="col-sm-2 control-label col-xs-2">文章内容</label>
+                <div class="col-sm-10 col-xs-10">
+                    {{ form.media }}
+                    {{ form.content }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="img" class="col-sm-2 control-label col-xs-2">文章图片</label>
+                <div class="col-sm-10 col-xs-10">
+                    <input type="file" name="img" id="img" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="tags" class="col-sm-2 control-label col-xs-2">标签</label>
+                <div class="col-sm-10 col-xs-10">
+                    <span>如需多选请按ctrl</span>
+                    <select name="tags" id="tags" multiple="multiple" size="5" class="form-control show-half">
+                        {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10 col-xs-10">
+                    <button type="submit" class="btn btn-primary">发表</button>
+                </div>
+            </div>
+        </form>
+    </article>
+{% endblock %}
+{% block myJs %}
+    <script>
+        $(function () {
+            MarkDownEditor = editormd("id_content-wmd-wrapper", {
+                width: "100%",
+                height: 800
+            });
+            var oH2 = document.getElementById("mnavh");
+            var oUl = document.getElementById("starlist");
+            oH2.onclick = function () {
+                var style = oUl.style;
+                style.display = style.display == "block" ? "none" : "block";
+                oH2.className = style.display == "block" ? "open" : ""
+            }
+
+            $('.search_ico').click(function () {
+                $('.search_bar').toggleClass('search_open');
+                if ($('#keyboard').val().length > 2) {
+                    $('#keyboard').val('');
+                    $('#searchform').submit();
+                } else {
+                    return false;
+                }
+            });
+        })
+    </script>
+{% endblock %}

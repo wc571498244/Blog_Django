@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    时间轴
+{% endblock %}
+{% block myCss %}
+    <link href="{% static 'css/time.css' %}" rel="stylesheet">
+{% endblock %}
+{% block container %}
+    <article>
+        <div class="timebox">
+            <ul>
+                {% for article in current_articles %}
+                    <li><span>{{ article.date | date:"Y-m-d" }}</span><i><a
+                            href="{% url 'article:details' %}?article_id={{ article.id }}"
+                            target="_blank">{{ article.title }}</a></i></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="pagelist">
+                <a href="{% url 'article:time_tree' %}?page={{ current_articles.paginator.page_range.0 }}">首页</a>
+                {% if current_articles.has_previous %}
+                    <a href="{% url 'article:time_tree' %}?page={{ current_articles.previous_page_number }}">上一页</a>
+                {% else %}
+                    <span>上一页</span>
+                {% endif %}
+
+                {% for page in page_range %}
+                    {% if current_page == page %}
+                        <b>{{ page }}</b>
+                    {% else %}
+                        <a href="{% url 'article:time_tree' %}?page={{ page }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if current_articles.has_next %}
+                    <a href="{% url 'article:time_tree' %}?page={{ current_articles.next_page_number }}">下一页</a>
+                {% else %}
+                    <span>下一页</span>
+                {% endif %}
+                <a href="{% url 'article:time_tree' %}?page={{ current_articles.paginator.page_range.stop | add:"-1" }}">尾页</a>
+            </div>
+    </article>
+{% endblock %}
+{% block myJs %}
+    <script src="{% static 'js/time.js' %}"></script>
+{% endblock %}

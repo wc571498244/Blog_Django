@@ -1,0 +1,65 @@
+{% load staticfiles %}
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wcc的个人博客|注册</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-grid.min.css' %}"/><!--CSS RESET-->
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/loginForm.css' %}">
+</head>
+<body>
+<div class="demo form-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6">
+                <form class="form-horizontal" action="{% url 'user:register' %}" method="post">
+                    {% csrf_token %}
+                    <div class="heading">注册</div>
+                    <div class="fail">{{ form.errors }} {{ msg }}</div>
+                    <div class="form-group">
+                        <i class="fa fa-user"></i>
+                        <input required name="username" type="text" class="form-control" placeholder="用户名"
+                               id="exampleInputEmail1">
+                    </div>
+                    <div class="form-group">
+                        <i class="fa fa-lock"></i>
+                        <input required name="password" type="password" class="form-control" id="password"
+                               placeholder="密码"/>
+                    </div>
+                    <div class="form-group">
+                        <i class="fa fa-lock"></i>
+                        <input required name="repassword" type="password" class="form-control" id="repassword"
+                               placeholder="确认密码"/>
+                    </div>
+                    <div class="form-group">
+                        <i class="fa fa-envelope-open-o"></i>
+                        <input required name="email" type="email" class="form-control" id="email" placeholder="邮箱"/>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-default"><i class="fa fa-arrow-right"></i></button>
+                        <span>已有账号 <a href="{% url 'user:user_login' %}" class="create_account">立即登录</a></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+<script>
+    $(function () {
+        $("button[type=submit]").click(function () {
+            var pwd = $("#password").val();
+            var repwd = $("#repassword").val();
+            if (pwd != repwd) {
+                alert("两次密码不一致，请重新输入！");
+                $("#repassword").val("");
+                $("#password").val("");
+                return false;
+            }
+        });
+    });
+</script>
+</html>
